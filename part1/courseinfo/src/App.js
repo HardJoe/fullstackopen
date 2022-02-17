@@ -1,68 +1,54 @@
-const Header = (props) => {
-  return (
-    <>
-      <h1>{props.course}</h1>
-    </>
-  )
-}
+const Header = ({ name }) => (
+  <div>
+    <h1>{name}</h1>
+  </div>
+)
 
-const Part = (props) => {
-  return (
-    <>
-      <p>
-        {props.name} → {props.exs}
-      </p>
-    </>
-  )
-}
+const Part = ({ name, exs }) => (
+  <div>
+    <p>{name} {exs}</p>
+  </div>
+)
 
-const Content = (props) => {
-  return (
-    <>
-      <Part name={props.parts[0].name} exs={props.parts[0].exercises} />
-      <Part name={props.parts[1].name} exs={props.parts[1].exercises} />
-      <Part name={props.parts[2].name} exs={props.parts[2].exercises} />
-    </>
-  )
-}
+const Content = ({ parts }) => (
+  <div>
+    {parts.map(part =>
+      <Part key={part.id} name={part.name} exs={part.exercises} />
+    )}
+  </div>
+)
 
-const Total = (props) => {
-  const total = 
-  props.parts[0].exercises + props.parts[1].exercises + 
-  props.parts[2].exercises
-  return (
-    <>
-      <p>Number of exercises: {total}</p>
-    </>
-  )
-}
+const Course = ({ course }) => (
+  <div>
+    <Header name={course.name} />
+    <Content parts={course.parts} />
+  </div>
+)
 
 const App = () => {
   const course = {
+    id: 1,
     name: 'Half Stack application development',
     parts: [
       {
         name: 'Fundamentals of React',
-        exercises: 10
+        exercises: 10,
+        id: 1
       },
       {
         name: 'Using props to pass data',
-        exercises: 7
+        exercises: 7,
+        id: 2
       },
       {
         name: 'State of a component',
-        exercises: 14
+        exercises: 14,
+        id: 3
       }
     ]
   }
 
-  return (
-    <div>
-      <Header course={course.name} />
-      <Content parts={course.parts} />
-      <Total parts={course.parts} />
-    </div>
-  )
+  return <Course course={course} />
 }
 
 export default App

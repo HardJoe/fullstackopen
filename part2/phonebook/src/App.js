@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { isEqual } from 'lodash'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -8,12 +9,22 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    const personObject = {
+    const newPerson = {
       name: newName,
     }
     
-    setPersons(persons.concat(personObject))
-    setNewName('')
+    let isFound = false
+    for (const person of persons) {
+      if (isEqual(person, newPerson)) {
+        alert(`${newName} is already added to phonebook`)
+        isFound = true
+        break
+      }
+    }
+    if (!isFound) {
+      setPersons(persons.concat(newPerson))
+      setNewName('')
+    }
   }
 
   const handlePersonChange = (event) => {

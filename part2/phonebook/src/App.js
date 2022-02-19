@@ -1,5 +1,38 @@
 import { useState, useEffect } from 'react'
 
+const Filter = ({ query, handleQueryChange }) => (
+  <div>
+    <p>
+      filter shown with 
+      <input value={query} onChange={handleQueryChange} />
+    </p>
+  </div>
+)
+
+const PersonForm = (props) => (
+  <form onSubmit={props.addPerson}>
+    <div>
+      name: 
+      <input value={props.newName} onChange={props.handleNameChange} />
+    </div>
+    <div>
+      number: 
+      <input value={props.newNumber} onChange={props.handleNumberChange}/>
+    </div>
+    <div>
+      <button type="submit">add</button>
+    </div>
+  </form>
+)
+
+const Persons = ({ searchResult }) => (
+  <div>
+    {searchResult.map(person => 
+      <p key={person.id}>{person.name} {person.number}</p>
+    )}
+  </div>
+)
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456', id: 1 },
@@ -55,28 +88,19 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        <p>
-          filter shown with 
-          <input value={query} onChange={handleQueryChange} />
-        </p>
-      </div>
-      <h2>add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange}/>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      {searchResult.map(person => 
-        <p key={person.id}>{person.name} {person.number}</p>
-      )}
+      <Filter query={query} handleQueryChange={handleQueryChange} />
+
+      <h3>Add a new</h3>
+      <PersonForm 
+        addPerson={addPerson}
+        newName={newName} 
+        newNumber={newNumber}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+      />
+      
+      <h3>Numbers</h3>
+      <Persons searchResult={searchResult} />
     </div>
   )
 }

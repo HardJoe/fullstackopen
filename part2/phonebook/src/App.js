@@ -10,15 +10,21 @@ const Filter = ({ query, handleQueryChange }) => (
   </div>
 );
 
-const PersonForm = (props) => (
-  <form onSubmit={props.addPerson}>
+const PersonForm = ({
+  addPerson,
+  newName,
+  handleNameChange,
+  newNumber,
+  handleNumberChange,
+}) => (
+  <form onSubmit={addPerson}>
     <div>
       name:
-      <input value={props.newName} onChange={props.handleNameChange} />
+      <input value={newName} onChange={handleNameChange} />
     </div>
     <div>
       number:
-      <input value={props.newNumber} onChange={props.handleNumberChange} />
+      <input value={newNumber} onChange={handleNumberChange} />
     </div>
     <div>
       <button type="submit">add</button>
@@ -60,7 +66,19 @@ const App = () => {
     );
 
     if (result.length >= 1) {
-      alert(`${result[0].name} is already added to phonebook`);
+      const oldPerson = result[0];
+      oldPerson.number = newNumber;
+      if (
+        window.confirm(
+          `${oldPerson.name} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        personService.update(oldPerson.id, oldPerson).then((data) => {
+          setPersons(
+            persons.map((person) => (person.id != oldPerson.id ? person : data))
+          );
+        });
+      }
     } else {
       personService.create(newPerson).then((data) => {
         setPersons(persons.concat(data));
@@ -85,6 +103,7 @@ const App = () => {
   const handleDelete = (event) => {
     const name = event.target.name;
     const id = event.target.value;
+
     if (window.confirm(`Delete ${name}?`)) {
       personService.deleteId(id).then((data) => {
         setPersons(persons.filter((person) => person.id != id));

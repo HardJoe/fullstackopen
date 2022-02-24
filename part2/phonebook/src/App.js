@@ -26,11 +26,14 @@ const PersonForm = (props) => (
   </form>
 );
 
-const Persons = ({ searchResult }) => (
+const Persons = ({ searchResult, handleDelete }) => (
   <div>
     {searchResult.map((person) => (
       <p key={person.id}>
         {person.name} {person.number}
+        <button name={person.name} value={person.id} onClick={handleDelete}>
+          delete
+        </button>
       </p>
     ))}
   </div>
@@ -79,6 +82,16 @@ const App = () => {
     setQuery(event.target.value);
   };
 
+  const handleDelete = (event) => {
+    const name = event.target.name;
+    const id = event.target.value;
+    if (window.confirm(`Delete ${name}?`)) {
+      personService.deleteId(id).then((data) => {
+        setPersons(persons.filter((person) => person.id != id));
+      });
+    }
+  };
+
   // https://stackoverflow.com/a/58887307
   useEffect(() => {
     const result = persons.filter((person) =>
@@ -90,7 +103,6 @@ const App = () => {
   useEffect(() => {
     personService.getAll().then((data) => {
       setPersons(data);
-      console.log('persons', data);
     });
   }, []);
 
@@ -109,7 +121,7 @@ const App = () => {
       />
 
       <h3>Numbers</h3>
-      <Persons searchResult={searchResult} />
+      <Persons searchResult={searchResult} handleDelete={handleDelete} />
     </div>
   );
 };

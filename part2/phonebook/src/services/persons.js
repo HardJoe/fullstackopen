@@ -2,11 +2,6 @@ import axios from 'axios';
 
 const baseUrl = 'http://localhost:3001/persons';
 
-// const getAll = () => {
-//   const request = axios.get(baseUrl);
-//   return request.then((response) => response.data);
-// };
-
 const getAll = async () => {
   try {
     const resp = await axios.get(baseUrl);
@@ -15,11 +10,6 @@ const getAll = async () => {
     console.error(err);
   }
 };
-
-// const create = (newObject) => {
-//   const request = axios.post(baseUrl, newObject);
-//   return request.then((response) => response.data);
-// };
 
 const create = async (newObject) => {
   try {
@@ -30,27 +20,14 @@ const create = async (newObject) => {
   }
 };
 
-// const update = (id, newObject) => {
-//   const request = axios.put(`${baseUrl}/${id}`, newObject);
-//   return request.then((response) => response.data);
-// };
-
 const update = async (id, newObject) => {
-  try {
-    const resp = await axios.put(`${baseUrl}/${id}`, newObject);
-    return resp.data;
-  } catch (err) {
-    console.error(err);
-  }
+  const resp = await axios.put(`${baseUrl}/${id}`, newObject);
+  return resp.data;
 };
 
 const deleteId = async (id) => {
-  try {
-    const resp = await axios.delete(`${baseUrl}/${id}`);
-    return resp.data;
-  } catch (err) {
-    console.error(err);
-  }
+  const resp = await axios.delete(`${baseUrl}/${id}`);
+  return resp.data;
 };
 
 export default { getAll, create, update, deleteId };

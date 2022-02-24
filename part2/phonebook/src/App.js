@@ -33,12 +33,12 @@ const PersonForm = ({
   </form>
 );
 
-const Persons = ({ searchResult, handleDelete }) => (
+const Persons = ({ searchResult, deletePerson }) => (
   <div>
     {searchResult.map((person) => (
       <p key={person.id}>
         {person.name} {person.number}
-        <button name={person.name} value={person.id} onClick={handleDelete}>
+        <button name={person.name} value={person.id} onClick={deletePerson}>
           delete
         </button>
       </p>
@@ -54,6 +54,14 @@ const SuccessNotification = ({ message }) => {
   return <div className="success">{message}</div>;
 };
 
+const ErrorNotification = ({ message }) => {
+  if (message === null) {
+    return null;
+  }
+
+  return <div className="error">{message}</div>;
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
@@ -61,6 +69,7 @@ const App = () => {
   const [query, setQuery] = useState('');
   const [searchResult, setSearchResult] = useState(persons);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const showSuccessMessage = (content) => {
     setSuccessMessage(content);
@@ -69,45 +78,67 @@ const App = () => {
     }, 5000);
   };
 
+  const showErrorMessage = (content) => {
+    setErrorMessage(content);
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
+  };
+
   const clearForm = () => {
     setNewName('');
     setNewNumber('');
   };
 
+  const removeDeletedPerson = (id) => {
+    setPersons(
+      persons.filter((person) => person !== undefined && person.id != id)
+    );
+  };
+
   const addPerson = (event) => {
     event.preventDefault();
 
-    const newPerson = {
-      name: newName,
-      number: newNumber,
-      id:
-        Math.max.apply(
-          Math,
-          persons.map((person) => person.id)
-        ) + 1,
-    };
-
     const result = persons.filter(
-      (person) => person.name.toLowerCase() === newPerson.name.toLowerCase()
+      (person) => person.name.toLowerCase() === newName.toLowerCase()
     );
 
     if (result.length >= 1) {
       const oldPerson = result[0];
-      oldPerson.number = newNumber;
       if (
         window.confirm(
           `${oldPerson.name} is already added to phonebook, replace the old number with a new one?`
         )
       ) {
-        personService.update(oldPerson.id, oldPerson).then((data) => {
-          setPersons(
-            persons.map((person) => (person.id != oldPerson.id ? person : data))
-          );
-          clearForm();
-          showSuccessMessage(`Changed ${oldPerson.name}'s number`);
-        });
+        oldPerson.number = newNumber;
+        personService
+          .update(oldPerson.id, oldPerson)
+          .then((data) => {
+            setPersons(
+              persons.map((person) =>
+                person.id != oldPerson.id ? person : data
+              )
+            );
+            showSuccessMessage(`Changed ${oldPerson.name}'s number`);
+          })
+          .catch((err) => {
+            removeDeletedPerson(oldPerson.id);
+            showErrorMessage(
+              `Information of ${oldPerson.name} has already been removed from server`
+            );
+          });
+        clearForm();
       }
     } else {
+      const newPerson = {
+        name: newName,
+        number: newNumber,
+        id:
+          Math.max.apply(
+            Math,
+            persons.map((person) => person.id)
+          ) + 1,
+      };
       personService.create(newPerson).then((data) => {
         setPersons(persons.concat(newPerson));
         clearForm();
@@ -128,15 +159,23 @@ const App = () => {
     setQuery(event.target.value);
   };
 
-  const handleDelete = (event) => {
+  const deletePerson = (event) => {
     const name = event.target.name;
     const id = event.target.value;
 
     if (window.confirm(`Delete ${name}?`)) {
-      personService.deleteId(id).then((data) => {
-        setPersons(persons.filter((person) => person.id != id));
-        showSuccessMessage(`Deleted ${name}`);
-      });
+      personService
+        .deleteId(id)
+        .then((data) => {
+          removeDeletedPerson(id);
+          showSuccessMessage(`Deleted ${name}`);
+        })
+        .catch((err) => {
+          removeDeletedPerson(id);
+          showErrorMessage(
+            `Information of ${name} has already been removed from server`
+          );
+        });
     }
   };
 
@@ -158,6 +197,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <SuccessNotification message={successMessage} />
+      <ErrorNotification message={errorMessage} />
       <Filter query={query} handleQueryChange={handleQueryChange} />
 
       <h3>Add a new</h3>
@@ -170,7 +210,7 @@ const App = () => {
       />
 
       <h3>Numbers</h3>
-      <Persons searchResult={searchResult} handleDelete={handleDelete} />
+      <Persons searchResult={searchResult} deletePerson={deletePerson} />
     </div>
   );
 };

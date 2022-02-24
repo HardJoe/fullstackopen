@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import personService from './services/persons';
+import './index.css';
 
 const Filter = ({ query, handleQueryChange }) => (
   <div>
@@ -45,12 +46,33 @@ const Persons = ({ searchResult, handleDelete }) => (
   </div>
 );
 
+const SuccessNotification = ({ message }) => {
+  if (message === null) {
+    return null;
+  }
+
+  return <div className="success">{message}</div>;
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [query, setQuery] = useState('');
   const [searchResult, setSearchResult] = useState(persons);
+  const [successMessage, setSuccessMessage] = useState(null);
+
+  const showSuccessMessage = (content) => {
+    setSuccessMessage(content);
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 5000);
+  };
+
+  const clearForm = () => {
+    setNewName('');
+    setNewNumber('');
+  };
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -58,7 +80,11 @@ const App = () => {
     const newPerson = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1,
+      id:
+        Math.max.apply(
+          Math,
+          persons.map((person) => person.id)
+        ) + 1,
     };
 
     const result = persons.filter(
@@ -77,13 +103,15 @@ const App = () => {
           setPersons(
             persons.map((person) => (person.id != oldPerson.id ? person : data))
           );
+          clearForm();
+          showSuccessMessage(`Changed ${oldPerson.name}'s number`);
         });
       }
     } else {
       personService.create(newPerson).then((data) => {
-        setPersons(persons.concat(data));
-        setNewName('');
-        setNewNumber('');
+        setPersons(persons.concat(newPerson));
+        clearForm();
+        showSuccessMessage(`Added ${newPerson.name}`);
       });
     }
   };
@@ -107,6 +135,7 @@ const App = () => {
     if (window.confirm(`Delete ${name}?`)) {
       personService.deleteId(id).then((data) => {
         setPersons(persons.filter((person) => person.id != id));
+        showSuccessMessage(`Deleted ${name}`);
       });
     }
   };
@@ -128,6 +157,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <SuccessNotification message={successMessage} />
       <Filter query={query} handleQueryChange={handleQueryChange} />
 
       <h3>Add a new</h3>

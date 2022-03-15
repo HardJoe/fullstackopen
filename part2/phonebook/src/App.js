@@ -110,6 +110,7 @@ const App = () => {
           `${oldPerson.name} is already added to phonebook, replace the old number with a new one?`
         )
       ) {
+        const oldNumber = oldPerson.number;
         oldPerson.number = newNumber;
         personService
           .update(oldPerson.id, oldPerson)
@@ -122,10 +123,8 @@ const App = () => {
             showSuccessMessage(`Changed ${oldPerson.name}'s number`);
           })
           .catch((err) => {
-            removeDeletedPerson(oldPerson.id);
-            showErrorMessage(
-              `Information of ${oldPerson.name} has already been removed from server`
-            );
+            oldPerson.number = oldNumber;
+            showErrorMessage(err.response.data.error);
           });
         clearForm();
       }
@@ -133,17 +132,18 @@ const App = () => {
       const newPerson = {
         name: newName,
         number: newNumber,
-        id:
-          Math.max.apply(
-            Math,
-            persons.map((person) => person.id)
-          ) + 1,
       };
-      personService.create(newPerson).then((data) => {
-        setPersons(persons.concat(newPerson));
-        clearForm();
-        showSuccessMessage(`Added ${newPerson.name}`);
-      });
+      personService
+        .create(newPerson)
+        .then((data) => {
+          setPersons(persons.concat(newPerson));
+          clearForm();
+          showSuccessMessage(`Added ${newPerson.name}`);
+        })
+        .catch((err) => {
+          clearForm();
+          showErrorMessage(err.response.data.error);
+        });
     }
   };
 

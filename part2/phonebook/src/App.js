@@ -126,7 +126,6 @@ const App = () => {
             oldPerson.number = oldNumber;
             showErrorMessage(err.response.data.error);
           });
-        clearForm();
       }
     } else {
       const newPerson = {
@@ -137,14 +136,14 @@ const App = () => {
         .create(newPerson)
         .then((data) => {
           setPersons(persons.concat(newPerson));
-          clearForm();
           showSuccessMessage(`Added ${newPerson.name}`);
         })
         .catch((err) => {
-          clearForm();
           showErrorMessage(err.response.data.error);
         });
     }
+
+    clearForm();
   };
 
   const handleNameChange = (event) => {

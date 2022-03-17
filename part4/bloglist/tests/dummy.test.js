@@ -87,12 +87,12 @@ describe('total likes', () => {
 });
 
 describe('favorite blog', () => {
-  test('of empty list is zero', () => {
+  test('of empty list is empty', () => {
     const result = listHelper.favoriteBlog([]);
     expect(result).toEqual({});
   });
 
-  test('when list has only one blog, equals the likes of that', () => {
+  test('when list has only one blog, returns that one blog', () => {
     const result = listHelper.favoriteBlog(listWithOneBlog);
     expect(result).toEqual({
       title: 'Go To Statement Considered Harmful',
@@ -101,12 +101,38 @@ describe('favorite blog', () => {
     });
   });
 
-  test('of a bigger list is calculated right', () => {
+  test('of a bigger list, returns the blog with most likes', () => {
     const result = listHelper.favoriteBlog(blogs);
     expect(result).toEqual({
       title: 'Canonical string reduction',
       author: 'Edsger W. Dijkstra',
       likes: 12,
+    });
+  });
+});
+
+describe('most blogs', () => {
+  test('of empty list is undefined', () => {
+    const result = listHelper.mostBlogs([]);
+    expect(result).toEqual({
+      author: undefined,
+      blogs: 0,
+    });
+  });
+
+  test('when list has only one blog, returns that one author', () => {
+    const result = listHelper.mostBlogs(listWithOneBlog);
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      blogs: 1,
+    });
+  });
+
+  test('of a bigger list, returns the author with most blogs', () => {
+    const result = listHelper.mostBlogs(blogs);
+    expect(result).toEqual({
+      author: 'Robert C. Martin',
+      blogs: 3,
     });
   });
 });

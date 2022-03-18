@@ -81,6 +81,15 @@ describe('post blogs', () => {
 
     expect(lastBlog.likes).toBe(0);
   });
+
+  test('missing title and url returns bad request', async () => {
+    const newBlog = {
+      url: 'http://www.bruh.com',
+      likes: 420,
+    };
+
+    await api.post('/api/blogs').send(newBlog).expect(400);
+  });
 });
 
 afterAll(() => {

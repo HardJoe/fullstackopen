@@ -65,6 +65,22 @@ describe('post blogs', () => {
     expect(response.body).toHaveLength(initialBlogs.length + 1);
     expect(titles).toContain('Why is TDD Important?');
   });
+
+  test('missing likes defaults to 0 likes', async () => {
+    const newBlog = {
+      title: 'No likes?',
+      author: 'Victor Azalea',
+      url: 'http://www.victor.com',
+    };
+
+    await api.post('/api/blogs').send(newBlog);
+
+    const response = await api.get('/api/blogs');
+
+    const lastBlog = response.body[response.body.length - 1];
+
+    expect(lastBlog.likes).toBe(0);
+  });
 });
 
 afterAll(() => {

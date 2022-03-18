@@ -43,6 +43,30 @@ describe('get blogs', () => {
   });
 });
 
+describe('post blogs', () => {
+  test('a valid blog can be added', async () => {
+    const newBlog = {
+      title: 'Why is TDD Important?',
+      author: 'Ahmad Ghozali',
+      url: 'http://www.ghozalieveryday.com',
+      likes: 1,
+    };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    const response = await api.get('/api/blogs');
+
+    const titles = response.body.map((r) => r.title);
+
+    expect(response.body).toHaveLength(initialBlogs.length + 1);
+    expect(titles).toContain('Why is TDD Important?');
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });

@@ -29,10 +29,18 @@ beforeEach(async () => {
   await blogObject.save();
 });
 
-test('there are two blogs', async () => {
-  const response = await api.get('/api/blogs');
+describe('get blogs', () => {
+  test('there are two blogs', async () => {
+    const response = await api.get('/api/blogs');
 
-  expect(response.body).toHaveLength(initialBlogs.length);
+    expect(response.body).toHaveLength(initialBlogs.length);
+  });
+
+  test('blog id is defined', async () => {
+    const response = await api.get('/api/blogs');
+
+    expect(response.body[0].id).toBeDefined();
+  });
 });
 
 afterAll(() => {

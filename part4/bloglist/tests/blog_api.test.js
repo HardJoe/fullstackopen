@@ -96,6 +96,50 @@ describe('post blogs', () => {
   });
 });
 
+describe('update blogs', () => {
+  test('succeeds if id and data is valid', async () => {
+    const newBlog = {
+      title: 'Why is Gitflow not Important?',
+      author: 'Ahmad Irfan',
+      url: 'http://www.irfaneveryday.com',
+      likes: 69,
+    };
+
+    await api
+      .put('/api/blogs/5a422a851b54a676234d17f7')
+      .send(newBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+
+    const response = await api.get('/api/blogs');
+
+    const titles = response.body.map((r) => r.title);
+
+    expect(titles).toContain('Why is Gitflow not Important?');
+    expect(titles).not.toContain('React patterns');
+  });
+
+  test('fails with status code 400 if id is invalid', async () => {
+    await api.put('/api/blogs/asd234').expect(400);
+  });
+
+  test('fails with status code 404 if blog is not found', async () => {
+    await api.put('/api/blogs/123123123123123123123123').expect(404);
+  });
+
+  test('fails with status code 400 if data is invalid', async () => {
+    const newBlog = {
+      url: 'http://www.irfaneveryday.com',
+      likes: 'aaa',
+    };
+
+    await api
+      .put('/api/blogs/5a422a851b54a676234d17f7')
+      .send(newBlog)
+      .expect(400);
+  });
+});
+
 describe('delete blogs', () => {
   test('a valid blog can be deleted', async () => {
     await api.delete('/api/blogs/5a422a851b54a676234d17f7').expect(204);

@@ -27,14 +27,18 @@ const initialBlogs = [
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  let blogObject = new Blog(initialBlogs[0]);
-  await blogObject.save();
-  blogObject = new Blog(initialBlogs[1]);
-  await blogObject.save();
+  await Blog.insertMany(initialBlogs);
 });
 
-describe('get blogs', () => {
-  test('there are two blogs', async () => {
+describe('get all blogs', () => {
+  test('blogs are returned as json', async () => {
+    await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+  });
+
+  test('all blogs are returned', async () => {
     const response = await api.get('/api/blogs');
 
     expect(response.body).toHaveLength(initialBlogs.length);
@@ -45,10 +49,18 @@ describe('get blogs', () => {
 
     expect(response.body[0].id).toBeDefined();
   });
+
+  test('a specific blog is within the returned blogs', async () => {
+    const response = await api.get('/api/blogs');
+
+    const titles = response.body.map((r) => r.title);
+
+    expect(titles).toContain('Go To Statement Considered Harmful');
+  });
 });
 
-describe('post blogs', () => {
-  test('a valid blog can be added', async () => {
+describe('post a blog', () => {
+  test('succeeds with valid data', async () => {
     const newBlog = {
       title: 'Why is TDD Important?',
       author: 'Ahmad Ghozali',
@@ -86,7 +98,7 @@ describe('post blogs', () => {
     expect(lastBlog.likes).toBe(0);
   });
 
-  test('missing title and url returns bad request', async () => {
+  test('fails with status code 400 if data is invalid', async () => {
     const newBlog = {
       url: 'http://www.bruh.com',
       likes: 420,
@@ -96,7 +108,7 @@ describe('post blogs', () => {
   });
 });
 
-describe('update blogs', () => {
+describe('update a blog', () => {
   test('succeeds if id and data is valid', async () => {
     const newBlog = {
       title: 'Why is Gitflow not Important?',
@@ -140,17 +152,24 @@ describe('update blogs', () => {
   });
 });
 
-describe('delete blogs', () => {
-  test('a valid blog can be deleted', async () => {
+describe('delete a blog', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
     await api.delete('/api/blogs/5a422a851b54a676234d17f7').expect(204);
 
     const response = await api.get('/api/blogs');
 
     expect(response.body).toHaveLength(initialBlogs.length - 1);
+
+    const titles = response.body.map((r) => r.title);
+    expect(titles).not.toContain('React patterns');
   });
 
-  test('invalid id returns bad request', async () => {
+  test('fails with status code 400 if id is invalid', async () => {
     await api.delete('/api/blogs/123123').expect(400);
+  });
+
+  test('fails with status code 404 if blog is not found', async () => {
+    await api.put('/api/blogs/123123123123123123123123').expect(404);
   });
 });
 

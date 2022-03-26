@@ -38,12 +38,31 @@ blogsRouter.put('/:id', async (request, response) => {
 });
 
 blogsRouter.delete('/:id', async (request, response) => {
-  const result = await Blog.findByIdAndRemove(request.params.id);
-  if (result) {
-    response.status(204).end();
-  } else {
+  let decodedToken;
+  try {
+    decodedToken = jwt.verify(request.token, process.env.SECRET);
+  } catch {
+    response.status(401).json({ error: 'token missing or invalid' });
+  }
+
+  const user = await User.findById(decodedToken.id);
+  if (!user) {
+    response.status(404).json({ error: 'user not found' });
+  }
+
+  const blog = await Blog.findByIdAndRemove(request.params.id);
+  if (!blog) {
     response.status(404).json({ error: 'blog not found' });
   }
+
+  if (blog.user.toString() !== user._id) {
+    response.status(403).json({ error: 'forbidden' });
+  }
+
+  user.blogs = user.blogs.filter((b) => b._id !== blog._id);
+  await user.save();
+
+  response.status(204).send();
 });
 
 module.exports = blogsRouter;

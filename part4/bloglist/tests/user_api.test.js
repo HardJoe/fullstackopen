@@ -36,10 +36,9 @@ describe('post a user', () => {
       .expect('Content-Type', /application\/json/);
 
     const response = await api.get('/api/users');
+    expect(response.body).toHaveLength(initialUsers.length + 1);
 
     const usernames = response.body.map((r) => r.username);
-
-    expect(response.body).toHaveLength(initialUsers.length + 1);
     expect(usernames).toContain('bruh');
   });
 

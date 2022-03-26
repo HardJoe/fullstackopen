@@ -50,10 +50,13 @@ describe('post a user', () => {
       password: 'so bruh',
     };
 
-    const response = await api.post('/api/users').send(newUser).expect(400);
+    let response = await api.post('/api/users').send(newUser).expect(400);
     expect(response.body.error).toContain(
       'shorter than the minimum allowed length (3)'
     );
+
+    response = await api.get('/api/users');
+    expect(response.body).toHaveLength(initialUsers.length);
   });
 
   test('fails with 400 if username is not unique', async () => {
@@ -63,29 +66,38 @@ describe('post a user', () => {
       password: 'so bruh',
     };
 
-    const response = await api.post('/api/users').send(newUser).expect(400);
+    let response = await api.post('/api/users').send(newUser).expect(400);
     expect(response.body.error).toContain('username must be unique');
+
+    response = await api.get('/api/users');
+    expect(response.body).toHaveLength(initialUsers.length);
   });
 
   test('fails with 400 if password is shorter than 3 chars', async () => {
     const newUser = {
       username: 'adam',
       name: 'Adam Relu',
-      password: 'so',
+      password: 's',
     };
 
-    const response = await api.post('/api/users').send(newUser).expect(400);
+    let response = await api.post('/api/users').send(newUser).expect(400);
     expect(response.body.error).toContain('password must be 3 chars long');
+
+    response = await api.get('/api/users');
+    expect(response.body).toHaveLength(initialUsers.length);
   });
 
   test('fails with 400 if username or password is missing', async () => {
     const newUser = {
-      username: 'adam',
-      name: 'Adam Relu',
+      username: 'bane',
+      name: 'Bane of Existence',
     };
 
-    const response = await api.post('/api/users').send(newUser).expect(400);
+    let response = await api.post('/api/users').send(newUser).expect(400);
     expect(response.body.error).toContain('username and password are required');
+
+    response = await api.get('/api/users');
+    expect(response.body).toHaveLength(initialUsers.length);
   });
 });
 

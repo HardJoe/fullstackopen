@@ -4,6 +4,7 @@ import ErrorMessage from './components/ErrorMessage';
 import SuccessMessage from './components/SuccessMessage';
 import Togglable from './components/Togglable';
 import BlogForm from './components/BlogForm';
+import LoginForm from './components/LoginForm';
 import blogService from './services/blogs';
 import loginService from './services/login';
 import './index.css';
@@ -12,8 +13,6 @@ const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -45,16 +44,15 @@ const App = () => {
     }, 5000);
   };
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-
+  const login = async (userObject) => {
     try {
-      const user = await loginService.login({ username, password });
-      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user));
-      blogService.setToken(user.token);
-      setUser(user);
-      setUsername('');
-      setPassword('');
+      const returnedUser = await loginService.login(userObject);
+      window.localStorage.setItem(
+        'loggedBlogAppUser',
+        JSON.stringify(returnedUser)
+      );
+      blogService.setToken(returnedUser.token);
+      setUser(returnedUser);
     } catch (err) {
       showErrorMessage('Wrong credentials');
     }
@@ -64,30 +62,6 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogAppUser');
     window.location.reload(false);
   };
-
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-  );
 
   const addBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility();
@@ -110,7 +84,7 @@ const App = () => {
         <ErrorMessage message={errorMessage} />
 
         <h2>Log in to application</h2>
-        {loginForm()}
+        <LoginForm login={login} />
       </div>
     );
   }

@@ -5,8 +5,9 @@ import loginService from './services/login';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [newBlog, setNewBlog] = useState('');
-  const [showAll, setShowAll] = useState(true);
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [url, setUrl] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -72,15 +73,53 @@ const App = () => {
     </form>
   );
 
-  // const blogForm = () => (
-  //   <form onSubmit={addBlog}>
-  //     <input
-  //       value={newBlog}
-  //       onChange={handleBlogChange}
-  //     />
-  //     <button type="submit">save</button>
-  //   </form>
-  // )
+  const addBlog = async (event) => {
+    event.preventDefault();
+
+    const newBlog = { title, author, url };
+    try {
+      const res = await blogService.create(newBlog);
+      setBlogs(blogs.concat(res));
+    } catch (err) {
+      setErrorMessage(err.message);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  };
+
+  const blogForm = () => (
+    <div>
+      <h2>Create New Blog</h2>
+      <form onSubmit={addBlog}>
+        <div>
+          title:
+          <input
+            name="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        <div>
+          author:
+          <input
+            name="author"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+          />
+        </div>
+        <div>
+          url:
+          <input
+            name="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+        </div>
+        <button type="submit">create</button>
+      </form>
+    </div>
+  );
 
   if (user === null) {
     return (
@@ -104,14 +143,12 @@ const App = () => {
 
       <br />
 
-      {/* {blogForm()} */}
+      {blogForm()}
 
       <div>
-        {blogs.map(
-          (blog) =>
-            // <Blog key={blog.id} blog={blog} />
-            blog.title
-        )}
+        {blogs.map((blog) => (
+          <Blog key={blog.id} blog={blog} />
+        ))}
       </div>
     </div>
   );

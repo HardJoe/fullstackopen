@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Blog from './components/Blog';
 import ErrorMessage from './components/ErrorMessage';
 import SuccessMessage from './components/SuccessMessage';
+import Togglable from './components/Togglable';
+import BlogForm from './components/BlogForm';
 import blogService from './services/blogs';
 import loginService from './services/login';
 import './index.css';
@@ -29,6 +31,8 @@ const App = () => {
       blogService.setToken(user.token);
     }
   }, []);
+
+  const blogFormRef = useRef();
 
   const showSuccessMessage = (content) => {
     setSuccessMessage(content);
@@ -90,6 +94,7 @@ const App = () => {
 
   const addBlog = async (event) => {
     event.preventDefault();
+    blogFormRef.current.toggleVisibility();
 
     const newBlog = { title, author, url };
     try {
@@ -102,36 +107,17 @@ const App = () => {
   };
 
   const blogForm = () => (
-    <div>
-      <h2>Create New Blog</h2>
-      <form onSubmit={addBlog}>
-        <div>
-          title:
-          <input
-            name="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-        <div>
-          author:
-          <input
-            name="author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-          />
-        </div>
-        <div>
-          url:
-          <input
-            name="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
+    <Togglable buttonLabel="new note" ref={blogFormRef}>
+      <BlogForm
+        handleSubmit={addBlog}
+        handleTitleChange={(e) => setTitle(e.target.value)}
+        handleAuthorChange={(e) => setAuthor(e.target.value)}
+        handleUrlChange={(e) => setUrl(e.target.value)}
+        title={title}
+        author={author}
+        url={url}
+      />
+    </Togglable>
   );
 
   if (user === null) {

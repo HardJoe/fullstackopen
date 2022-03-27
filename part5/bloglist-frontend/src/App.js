@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import Blog from './components/Blog';
+import ErrorMessage from './components/ErrorMessage';
+import SuccessMessage from './components/SuccessMessage';
 import blogService from './services/blogs';
 import loginService from './services/login';
+import './index.css';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [url, setUrl] = useState('');
+  const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -26,6 +30,20 @@ const App = () => {
     }
   }, []);
 
+  const showSuccessMessage = (content) => {
+    setSuccessMessage(content);
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 5000);
+  };
+
+  const showErrorMessage = (content) => {
+    setErrorMessage(content);
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
+  };
+
   const handleLogin = async (event) => {
     event.preventDefault();
 
@@ -37,10 +55,7 @@ const App = () => {
       setUsername('');
       setPassword('');
     } catch (err) {
-      setErrorMessage('Wrong credentials');
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      showErrorMessage('Wrong credentials');
     }
   };
 
@@ -80,11 +95,9 @@ const App = () => {
     try {
       const res = await blogService.create(newBlog);
       setBlogs(blogs.concat(res));
+      showSuccessMessage(`${res.title} by ${res.author} added`);
     } catch (err) {
-      setErrorMessage(err.message);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      showErrorMessage(err.message);
     }
   };
 
@@ -124,6 +137,9 @@ const App = () => {
   if (user === null) {
     return (
       <div>
+        <SuccessMessage message={successMessage} />
+        <ErrorMessage message={errorMessage} />
+
         <h2>Log in to application</h2>
         {loginForm()}
       </div>
@@ -134,7 +150,8 @@ const App = () => {
     <div>
       <h2>Blogs</h2>
 
-      {/* <Notification message={errorMessage} /> */}
+      <SuccessMessage message={successMessage} />
+      <ErrorMessage message={errorMessage} />
 
       <div>
         {user.name} logged in

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
-const Blog = ({ key, blog }) => {
+const Blog = ({ blog, updateBlog }) => {
   const [viewed, setViewed] = useState(false);
+  const [likes, setLikes] = useState(blog.likes);
 
   const blogStyle = {
     paddingTop: 10,
@@ -15,11 +16,17 @@ const Blog = ({ key, blog }) => {
     setViewed(!viewed);
   };
 
+  const handleLikeClick = () => {
+    setLikes(likes + 1);
+    blog.likes += 1;
+    updateBlog(blog);
+  };
+
   if (!viewed) {
     return (
       <div style={blogStyle}>
         {blog.title} by {blog.author}
-        <button value={key} onClick={handleViewClick}>
+        <button value={blog._id} onClick={handleViewClick}>
           view
         </button>
       </div>
@@ -30,13 +37,13 @@ const Blog = ({ key, blog }) => {
     <div style={blogStyle}>
       <div>
         {blog.title}
-        <button value={key} onClick={handleViewClick}>
+        <button value={blog.id} onClick={handleViewClick}>
           hide
         </button>
       </div>
       {blog.url}
       <div>
-        likes {blog.likes} <button>like</button>
+        likes {likes} <button onClick={handleLikeClick}>like</button>
       </div>
       {blog.author}
     </div>

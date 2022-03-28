@@ -73,7 +73,19 @@ const App = () => {
         `${returnedBlog.title} by ${returnedBlog.author} added`
       );
     } catch (err) {
-      showErrorMessage(err.message);
+      showErrorMessage(err.response.data.error);
+    }
+  };
+
+  const updateBlog = async (blogObject) => {
+    try {
+      blogObject.user = blogObject.user.id;
+      const returnedBlog = await blogService.update(blogObject.id, blogObject);
+      showSuccessMessage(
+        `${returnedBlog.title} by ${returnedBlog.author} updated`
+      );
+    } catch (err) {
+      showErrorMessage(err.response.data.error);
     }
   };
 
@@ -111,7 +123,7 @@ const App = () => {
 
       <div>
         {blogs.map((blog) => (
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
         ))}
       </div>
     </div>

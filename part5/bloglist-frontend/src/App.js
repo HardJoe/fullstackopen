@@ -89,6 +89,16 @@ const App = () => {
     }
   };
 
+  const deleteBlog = async (blogObject) => {
+    try {
+      await blogService.deleteOne(blogObject.id);
+      setBlogs(blogs.filter((blog) => blog.id !== blogObject.id));
+      showSuccessMessage(`${blogObject.title} by ${blogObject.author} deleted`);
+    } catch (err) {
+      showErrorMessage(err.response.data.error);
+    }
+  };
+
   if (user === null) {
     return (
       <div>
@@ -125,7 +135,13 @@ const App = () => {
         {blogs
           .sort((a, b) => (a.likes > b.likes ? -1 : 1))
           .map((blog) => (
-            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              updateBlog={updateBlog}
+              deleteBlog={deleteBlog}
+              user={user}
+            />
           ))}
       </div>
     </div>

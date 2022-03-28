@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const Blog = ({ blog, updateBlog }) => {
+const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
   const [viewed, setViewed] = useState(false);
   const [likes, setLikes] = useState(blog.likes);
 
@@ -20,6 +20,15 @@ const Blog = ({ blog, updateBlog }) => {
     setLikes(likes + 1);
     blog.likes += 1;
     updateBlog(blog);
+  };
+
+  const handleRemoveClick = () => {
+    const isConfirmed = window.confirm(
+      `Remove ${blog.title} by ${blog.author}?`
+    );
+    if (isConfirmed) {
+      deleteBlog(blog);
+    }
   };
 
   if (!viewed) {
@@ -46,6 +55,10 @@ const Blog = ({ blog, updateBlog }) => {
         likes {likes} <button onClick={handleLikeClick}>like</button>
       </div>
       {blog.author}
+      <br />
+      {user.username === blog.user.username ? (
+        <button onClick={handleRemoveClick}>remove</button>
+      ) : null}
     </div>
   );
 };

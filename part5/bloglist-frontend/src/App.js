@@ -34,14 +34,14 @@ const App = () => {
     setSuccessMessage(content);
     setTimeout(() => {
       setSuccessMessage(null);
-    }, 5000);
+    }, 3000);
   };
 
   const showErrorMessage = (content) => {
     setErrorMessage(content);
     setTimeout(() => {
       setErrorMessage(null);
-    }, 5000);
+    }, 3000);
   };
 
   const login = async (userObject) => {
@@ -122,9 +122,11 @@ const App = () => {
       <br />
 
       <div>
-        {blogs.map((blog) => (
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
-        ))}
+        {blogs
+          .sort((a, b) => (a.likes > b.likes ? -1 : 1))
+          .map((blog) => (
+            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+          ))}
       </div>
     </div>
   );

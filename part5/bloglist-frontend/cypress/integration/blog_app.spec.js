@@ -19,6 +19,7 @@ describe('Blog app', function () {
       cy.get('#username-input').type('mluukkai');
       cy.get('#password-input').type('salainen');
       cy.contains('login').click();
+
       cy.contains('logged in');
     });
 
@@ -26,6 +27,7 @@ describe('Blog app', function () {
       cy.get('#username-input').type('mluukkai');
       cy.get('#password-input').type('wrong');
       cy.contains('login').click();
+
       cy.contains('Log in to application');
       cy.get('.error').should('contain', 'Wrong credentials');
       cy.get('.error').should('have.css', 'color', 'rgb(255, 0, 0)');
@@ -40,45 +42,48 @@ describe('Blog app', function () {
     });
 
     it('A blog can be created', function () {
-      cy.contains('new note').click();
+      cy.contains('new blog').click();
       cy.get('#title-input').type('A New World');
       cy.get('#author-input').type('Aladdin');
       cy.get('#url-input').type('night.com');
       cy.contains('create').click();
+
       cy.get('.general-blog').contains('A New World by Aladdin');
       cy.get('.success').contains('A New World by Aladdin added');
     });
 
     it('A blog can be liked', function () {
-      cy.contains('new note').click();
+      cy.contains('new blog').click();
       cy.get('#title-input').type('A New World');
       cy.get('#author-input').type('Aladdin');
       cy.get('#url-input').type('night.com');
       cy.contains('create').click();
+
       cy.contains('view').click();
       cy.get('#like-button').click();
       cy.get('.blog').contains('likes 1');
     });
 
     it('A blog can be deleted', function () {
-      cy.contains('new note').click();
+      cy.contains('new blog').click();
       cy.get('#title-input').type('A New World');
       cy.get('#author-input').type('Aladdin');
       cy.get('#url-input').type('night.com');
       cy.contains('create').click();
+
       cy.contains('view').click();
       cy.contains('remove').click();
       cy.get('.success').contains('A New World by Aladdin deleted');
     });
 
     it('A blog cannot be deleted by other user', function () {
-      cy.contains('new note').click();
+      cy.contains('new blog').click();
       cy.get('#title-input').type('A New World');
       cy.get('#author-input').type('Aladdin');
       cy.get('#url-input').type('night.com');
       cy.contains('create').click();
-      cy.contains('logout').click();
 
+      cy.contains('logout').click();
       const user = {
         name: 'Dummy Mcdumbdumb',
         username: 'dummy',
@@ -91,9 +96,42 @@ describe('Blog app', function () {
       cy.get('#password-input').type('dumb123');
       cy.contains('login').click();
 
-      cy.contains('new note').click();
+      cy.contains('new blog').click();
       cy.contains('view').click();
       cy.get('.blog').should('not.contain', 'remove');
+    });
+
+    it('Bloglist is sorted based on likes', function () {
+      cy.contains('new blog').click();
+      cy.get('#title-input').type('A New World');
+      cy.get('#author-input').type('Aladdin');
+      cy.get('#url-input').type('night.com');
+      cy.contains('create').click();
+
+      cy.contains('new blog').click();
+      cy.get('#title-input').type('A New World 2');
+      cy.get('#author-input').type('Aladdin 2');
+      cy.get('#url-input').type('night2.com');
+      cy.contains('create').click();
+
+      cy.contains('view').click();
+      cy.contains('view').click();
+
+      cy.contains('night2.com').contains('like').click();
+      cy.reload();
+
+      let blogs = [];
+      cy.get('.blog-list')
+        .children()
+        .each(function ($el) {
+          blogs.push($el.text());
+        })
+        .then(function () {
+          expect(blogs).to.have.ordered.members([
+            'A New World 2 by Aladdin 2view',
+            'A New World by Aladdinview',
+          ]);
+        });
     });
   });
 });

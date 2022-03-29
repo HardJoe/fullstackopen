@@ -59,5 +59,41 @@ describe('Blog app', function () {
       cy.get('#like-button').click();
       cy.get('.blog').contains('likes 1');
     });
+
+    it('A blog can be deleted', function () {
+      cy.contains('new note').click();
+      cy.get('#title-input').type('A New World');
+      cy.get('#author-input').type('Aladdin');
+      cy.get('#url-input').type('night.com');
+      cy.contains('create').click();
+      cy.contains('view').click();
+      cy.contains('remove').click();
+      cy.get('.success').contains('A New World by Aladdin deleted');
+    });
+
+    it('A blog cannot be deleted by other user', function () {
+      cy.contains('new note').click();
+      cy.get('#title-input').type('A New World');
+      cy.get('#author-input').type('Aladdin');
+      cy.get('#url-input').type('night.com');
+      cy.contains('create').click();
+      cy.contains('logout').click();
+
+      const user = {
+        name: 'Dummy Mcdumbdumb',
+        username: 'dummy',
+        password: 'dumb123',
+      };
+      cy.request('POST', 'http://localhost:3003/api/users/', user);
+      cy.visit('http://localhost:3000');
+
+      cy.get('#username-input').type('dummy');
+      cy.get('#password-input').type('dumb123');
+      cy.contains('login').click();
+
+      cy.contains('new note').click();
+      cy.contains('view').click();
+      cy.get('.blog').should('not.contain', 'remove');
+    });
   });
 });

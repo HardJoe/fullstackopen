@@ -72,6 +72,9 @@ const App = () => {
       showSuccessMessage(
         `${returnedBlog.title} by ${returnedBlog.author} added`
       );
+
+      const newBlogs = await blogService.getAll();
+      setBlogs(newBlogs);
     } catch (err) {
       showErrorMessage(err.response.data.error);
     }

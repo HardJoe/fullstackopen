@@ -33,7 +33,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
 
   if (!viewed) {
     return (
-      <div style={blogStyle}>
+      <div className="general-blog" style={blogStyle}>
         {blog.title} by {blog.author}
         <button value={blog._id} onClick={handleViewClick}>
           view

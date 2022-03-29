@@ -27,7 +27,26 @@ describe('Blog app', function () {
       cy.get('#password-input').type('wrong');
       cy.contains('login').click();
       cy.contains('Log in to application');
-      cy.get('.error').contains('Wrong credentials');
+      cy.get('.error').should('contain', 'Wrong credentials');
+      cy.get('.error').should('have.css', 'color', 'rgb(255, 0, 0)');
+    });
+  });
+
+  describe('When logged in', function () {
+    beforeEach(function () {
+      cy.get('#username-input').type('mluukkai');
+      cy.get('#password-input').type('salainen');
+      cy.contains('login').click();
+    });
+
+    it('A blog can be created', function () {
+      cy.contains('new note').click();
+      cy.get('#title-input').type('A New World');
+      cy.get('#author-input').type('Aladdin');
+      cy.get('#url-input').type('night.com');
+      cy.contains('create').click();
+      cy.get('.general-blog').contains('A New World by Aladdin');
+      cy.get('.success').contains('A New World by Aladdin added');
     });
   });
 });

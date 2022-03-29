@@ -18,8 +18,8 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
 
   const handleLikeClick = () => {
     setLikes(likes + 1);
-    blog.likes += 1;
-    updateBlog(blog);
+    const updatedBlog = { ...blog, likes: likes + 1 };
+    updateBlog(updatedBlog);
   };
 
   const handleRemoveClick = () => {
@@ -52,7 +52,10 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
       </div>
       {blog.url}
       <div>
-        likes {likes} <button onClick={handleLikeClick}>like</button>
+        likes {likes}
+        <button id="like-button" onClick={handleLikeClick}>
+          like
+        </button>
       </div>
       {blog.author}
       <br />

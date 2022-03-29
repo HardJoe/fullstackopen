@@ -48,5 +48,16 @@ describe('Blog app', function () {
       cy.get('.general-blog').contains('A New World by Aladdin');
       cy.get('.success').contains('A New World by Aladdin added');
     });
+
+    it('A blog can be liked', function () {
+      cy.contains('new note').click();
+      cy.get('#title-input').type('A New World');
+      cy.get('#author-input').type('Aladdin');
+      cy.get('#url-input').type('night.com');
+      cy.contains('create').click();
+      cy.contains('view').click();
+      cy.get('#like-button').click();
+      cy.get('.blog').contains('likes 1');
+    });
   });
 });

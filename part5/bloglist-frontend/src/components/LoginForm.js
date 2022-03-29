@@ -21,7 +21,7 @@ const LoginForm = ({ login }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div>
+      <div id="login-form">
         username
         <input
           type="text"

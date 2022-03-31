@@ -37,11 +37,12 @@ export const vote = (id) => {
   };
 };
 
-const reducer = (state = initialState, action) => {
+const anecdoteReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'NEW_ANECDOTE':
       return state.concat(action.data);
     case 'VOTE':
+      console.table('state', state);
       const id = action.data.id;
       const oldAnecdote = state.find((a) => a.id === id);
       const updatedAnecdote = { ...oldAnecdote, votes: oldAnecdote.votes + 1 };
@@ -51,4 +52,4 @@ const reducer = (state = initialState, action) => {
   }
 };
 
-export default reducer;
+export default anecdoteReducer;

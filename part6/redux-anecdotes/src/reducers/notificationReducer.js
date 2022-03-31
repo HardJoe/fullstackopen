@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = null;
 
 const notificationSlice = createSlice({
-  name: 'notifications',
+  name: 'notification',
   initialState,
   reducers: {
     displayNotification(state, action) {

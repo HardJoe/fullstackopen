@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { vote } from '../reducers/anecdoteReducer';
-import AnecdoteForm from './AnecdoteForm';
 
 const Anecdote = ({ anecdote, handleVoteClick }) => {
   return (
@@ -14,7 +13,7 @@ const Anecdote = ({ anecdote, handleVoteClick }) => {
   );
 };
 
-const Anecdotes = () => {
+const AnecdoteList = () => {
   let anecdotes = useSelector((state) => state);
   anecdotes = anecdotes.sort(({ votes: a }, { votes: b }) => b - a);
   const dispatch = useDispatch();
@@ -29,9 +28,8 @@ const Anecdotes = () => {
           handleVoteClick={() => dispatch(vote(anecdote.id))}
         />
       ))}
-      <AnecdoteForm />
     </div>
   );
 };
 
-export default Anecdotes;
+export default AnecdoteList;

@@ -7,7 +7,16 @@ const getAll = async () => {
   return response.data;
 };
 
+const getId = () => (100000 * Math.random()).toFixed(0);
+
+const postOne = async (content) => {
+  const object = { content, id: getId(), votes: 0 };
+  const response = await axios.post(baseUrl, object);
+  return response.data;
+};
+
 const anecdoteService = {
   getAll,
+  postOne,
 };
 export default anecdoteService;

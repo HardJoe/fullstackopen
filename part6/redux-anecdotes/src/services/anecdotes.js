@@ -15,8 +15,14 @@ const postOne = async (content) => {
   return response.data;
 };
 
+const putOne = async (id, object) => {
+  const response = await axios.put(`${baseUrl}/${id}`, object);
+  return response.data;
+};
+
 const anecdoteService = {
   getAll,
   postOne,
+  putOne,
 };
 export default anecdoteService;

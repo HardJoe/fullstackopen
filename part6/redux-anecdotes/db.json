@@ -2,8 +2,8 @@
   "anecdotes": [
     {
       "content": "If it hurts, do it more often",
-      "id": "47145",
-      "votes": 0
+      "votes": 5,
+      "id": "47145"
     },
     {
       "content": "Adding manpower to a late software project makes it later!",
@@ -32,8 +32,8 @@
     },
     {
       "content": "Don't overexert yourself.",
-      "id": "11223",
-      "votes": 0
+      "votes": 3,
+      "id": "11223"
     },
     {
       "content": "test",
@@ -42,8 +42,8 @@
     },
     {
       "content": "bruh moment",
-      "id": "35724",
-      "votes": 0
+      "votes": 4,
+      "id": "35724"
     }
   ]
 }

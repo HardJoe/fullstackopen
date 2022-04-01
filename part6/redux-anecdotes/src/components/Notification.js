@@ -9,7 +9,9 @@ const Notification = (props) => {
     borderWidth: 1,
   };
 
-  return notification ? <div style={style}>{notification}</div> : null;
+  return notification.length > 0 ? (
+    <div style={style}>{notification[notification.length - 1]}</div>
+  ) : null;
 };
 
 const mapStateToProps = (state) => ({

@@ -113,9 +113,9 @@ const CreateNew = (props) => {
 
   const handleReset = (e) => {
     e.preventDefault();
-    content.reset();
-    author.reset();
-    info.reset();
+    content.onSubmit();
+    author.onSubmit();
+    info.onSubmit();
   };
 
   return (

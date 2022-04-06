@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setNotification } from '../reducers/notificationReducer';
 
 const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
   const [viewed, setViewed] = useState(false);
   const [likes, setLikes] = useState(blog.likes);
+  const dispatch = useDispatch();
 
   const blogStyle = {
     paddingTop: 10,
@@ -20,14 +23,16 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
     setLikes(likes + 1);
     const updatedBlog = { ...blog, likes: likes + 1 };
     updateBlog(updatedBlog);
+    dispatch(setNotification(`You liked "${updatedBlog.title}".`, 3, true));
   };
 
   const handleRemoveClick = () => {
     const isConfirmed = window.confirm(
-      `Remove ${blog.title} by ${blog.author}?`
+      `Remove ${blog.title} by ${blog.author}?`,
     );
     if (isConfirmed) {
       deleteBlog(blog);
+      dispatch(setNotification(`You removed "${blog.title}".`, 3, true));
     }
   };
 

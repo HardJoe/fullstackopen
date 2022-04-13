@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setNotification } from '../reducers/notificationReducer';
+import { deleteBlog, updateBlog } from '../reducers/blogReducer';
 
-const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
+const Blog = ({ blog, user }) => {
   const [viewed, setViewed] = useState(false);
-  const [likes, setLikes] = useState(blog.likes);
+
   const dispatch = useDispatch();
 
   const blogStyle = {
@@ -20,10 +20,8 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
   };
 
   const handleLikeClick = () => {
-    setLikes(likes + 1);
-    const updatedBlog = { ...blog, likes: likes + 1 };
-    updateBlog(updatedBlog);
-    dispatch(setNotification(`You liked "${updatedBlog.title}".`, 3, true));
+    const likedBlog = { ...blog, user: user.id, likes: blog.likes + 1 };
+    dispatch(updateBlog(likedBlog));
   };
 
   const handleRemoveClick = () => {
@@ -31,8 +29,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
       `Remove ${blog.title} by ${blog.author}?`,
     );
     if (isConfirmed) {
-      deleteBlog(blog);
-      dispatch(setNotification(`You removed "${blog.title}".`, 3, true));
+      dispatch(deleteBlog(blog));
     }
   };
 
@@ -57,7 +54,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
       </div>
       {blog.url}
       <div>
-        likes {likes}
+        likes {blog.likes}
         <button id="like-button" onClick={handleLikeClick}>
           like
         </button>

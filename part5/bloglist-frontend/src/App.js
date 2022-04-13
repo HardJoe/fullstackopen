@@ -105,7 +105,7 @@ const App = () => {
       <br />
 
       <div className="blog-list">
-        <BlogList updateBlog={updateBlog} deleteBlog={deleteBlog} user={user} />
+        <BlogList user={user} />
       </div>
     </div>
   );

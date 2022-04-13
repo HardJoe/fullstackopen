@@ -12,11 +12,13 @@ const blogSlice = createSlice({
     appendBlog(state, action) {
       state.push(action.payload);
     },
-    like(state, action) {
-      const id = action.payload;
-      const oldBlog = state.find((a) => a.id === id);
-      const updatedBlog = { ...oldBlog, likes: oldBlog.likes + 1 };
-      return state.map((a) => (a.id === id ? updatedBlog : a));
+    modifyBlog(state, action) {
+      const id = action.payload.id;
+      return state.map((b) => (b.id === id ? action.payload : b));
+    },
+    removeBlog(state, action) {
+      const id = action.payload.id;
+      return state.filter((b) => b.id !== id);
     },
   },
 });
@@ -42,13 +44,31 @@ export const createBlog = (blog) => {
   };
 };
 
-export const updateBlog = ({ id, ...rest }) => {
+export const updateBlog = (blog) => {
   return async (dispatch) => {
-    await blogService.update(id, rest);
-    dispatch(vote(id));
+    try {
+      const updatedBlog = await blogService.update(blog.id, blog);
+      dispatch(modifyBlog(updatedBlog));
+      dispatch(setNotification(`You liked "${blog.title}".`, 3, true));
+    } catch (err) {
+      dispatch(setNotification(err.response.data.error, 3, false));
+    }
   };
 };
 
-export const { appendBlog, vote, setBlogs } = blogSlice.actions;
+export const deleteBlog = (blog) => {
+  return async (dispatch) => {
+    try {
+      await blogService.deleteOne(blog.id);
+      dispatch(removeBlog(blog));
+      dispatch(setNotification(`You removed "${blog.title}".`, 3, true));
+    } catch (err) {
+      dispatch(setNotification(err.response.data.error, 3, false));
+    }
+  };
+};
+
+export const { setBlogs, appendBlog, modifyBlog, removeBlog } =
+  blogSlice.actions;
 
 export default blogSlice.reducer;

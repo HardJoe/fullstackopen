@@ -1,12 +1,15 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import BlogForm from './components/BlogForm';
 import BlogList from './components/BlogList';
 import LoginForm from './components/LoginForm';
+import MemberList from './components/MemberList';
 import Notification from './components/Notification';
 import Togglable from './components/Togglable';
 import './index.css';
 import { initializeBlogs } from './reducers/blogReducer';
+import { initializeMembers } from './reducers/memberReducer';
 import { setNotification } from './reducers/notificationReducer';
 import { setUser } from './reducers/userReducer';
 import blogService from './services/blogs';
@@ -16,8 +19,13 @@ const App = () => {
   const user = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(initializeBlogs());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(initializeMembers());
   }, [dispatch]);
 
   useEffect(() => {
@@ -63,13 +71,14 @@ const App = () => {
     );
   }
 
-  return (
+  const Home = () => (
     <div>
       <h2>Blogs</h2>
       <Notification />
 
       <div>
-        {user.name} logged in
+        <div>{user.name} logged in</div>
+        <br />
         <button onClick={removeStorage}>logout</button>
       </div>
 
@@ -85,6 +94,43 @@ const App = () => {
         <BlogList user={user} />
       </div>
     </div>
+  );
+
+  const Users = () => (
+    <div>
+      <h2>Blogs</h2>
+      <Notification />
+
+      <div>
+        <div>{user.name} logged in</div>
+        <br />
+        <button onClick={removeStorage}>logout</button>
+      </div>
+
+      <MemberList />
+    </div>
+  );
+
+  return (
+    <Router>
+      {/* <div>
+        <Link style={padding} to="/">
+          home
+        </Link>
+        <Link style={padding} to="/users">
+          users
+        </Link>
+      </div> */}
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/users" element={<Users />} />
+      </Routes>
+
+      {/* <div>
+        <i>Note app, Department of Computer Science 2022</i>
+      </div> */}
+    </Router>
   );
 };
 

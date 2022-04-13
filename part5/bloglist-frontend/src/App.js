@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import BlogForm from './components/BlogForm';
 import BlogList from './components/BlogList';
 import LoginForm from './components/LoginForm';
@@ -8,12 +8,12 @@ import Togglable from './components/Togglable';
 import './index.css';
 import { initializeBlogs } from './reducers/blogReducer';
 import { setNotification } from './reducers/notificationReducer';
+import { setUser } from './reducers/userReducer';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [user, setUser] = useState(null);
+  const user = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -24,7 +24,7 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser');
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      dispatch(setUser(user));
       blogService.setToken(user.token);
     }
   }, []);
@@ -42,7 +42,7 @@ const App = () => {
         JSON.stringify(returnedUser),
       );
       blogService.setToken(returnedUser.token);
-      setUser(returnedUser);
+      dispatch(setUser(returnedUser));
     } catch (err) {
       dispatch(setNotification('Wrong credentials.', 3, false));
     }
@@ -53,30 +53,7 @@ const App = () => {
     window.location.reload(false);
   };
 
-  const updateBlog = async (blogObject) => {
-    try {
-      blogObject.user = blogObject.user.id;
-      await blogService.update(blogObject.id, blogObject);
-    } catch (err) {
-      dispatch(setNotification(err.response.data.error, 3, false));
-    }
-  };
-
-  const deleteBlog = async (blogObject) => {
-    try {
-      await blogService.deleteOne(blogObject.id);
-      setBlogs(blogs.filter((blog) => blog.id !== blogObject.id));
-      setNotification(
-        `${blogObject.title} by ${blogObject.author} deleted.`,
-        3,
-        true,
-      );
-    } catch (err) {
-      dispatch(setNotification(err.response.data.error, 3, false));
-    }
-  };
-
-  if (user === null) {
+  if (!user) {
     return (
       <div>
         <h2>Log in to application</h2>

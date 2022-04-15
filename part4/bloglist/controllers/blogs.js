@@ -3,9 +3,13 @@ const middleware = require('../utils/middleware');
 const userExtractor = middleware.userExtractor;
 const Blog = require('../models/blog');
 const User = require('../models/user');
+const Comment = require('../models/comment');
+const blog = require('../models/blog');
 
 blogsRouter.get('', async (request, response) => {
-  const blogs = await Blog.find({}).populate('user', { blogs: 0 });
+  const blogs = await Blog.find({})
+    .populate('user', { blogs: 0 })
+    .populate('comments', { blog: 0 });
   response.json(blogs);
 });
 
@@ -23,6 +27,18 @@ blogsRouter.post('', userExtractor, async (request, response) => {
 
   user.blogs = user.blogs.concat(blog._id);
   await user.save();
+
+  response.status(201).json(result);
+});
+
+blogsRouter.post('/:id/comments', async (request, response) => {
+  const comment = new Comment(request.body);
+  comment.blog = request.params.id;
+  const result = await comment.save();
+
+  const blog = await Blog.findById(request.params.id);
+  blog.comments = blog.comments.concat(comment._id);
+  await blog.save();
 
   response.status(201).json(result);
 });

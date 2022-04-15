@@ -1,3 +1,4 @@
+import { Container } from '@material-ui/core';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, Route, Routes } from 'react-router-dom';
@@ -86,16 +87,15 @@ const App = () => {
 
   if (!user) {
     return (
-      <div>
-        <h2>Log in to application</h2>
+      <Container>
         <Notification />
         <LoginForm login={login} />
-      </div>
+      </Container>
     );
   }
 
   return (
-    <>
+    <Container>
       <div style={navbar}>
         <Link style={padding} to="/">
           blogs
@@ -119,10 +119,10 @@ const App = () => {
         <Route path="/blogs/:id" element={<Blog />} />
       </Routes>
 
-      {/* <div>
-        <i>Note app, Department of Computer Science 2022</i>
-      </div> */}
-    </>
+      <div>
+        <i>Blog app, © 2022 Joe Hartman </i>
+      </div>
+    </Container>
   );
 };
 

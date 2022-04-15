@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import BlogForm from './components/BlogForm';
 import BlogList from './components/BlogList';
 import LoginForm from './components/LoginForm';
+import Member from './components/Member';
 import MemberList from './components/MemberList';
 import Notification from './components/Notification';
 import Togglable from './components/Togglable';
@@ -15,6 +16,27 @@ import { setUser } from './reducers/userReducer';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
+const Home = ({ user }) => {
+  const blogFormRef = useRef();
+  const hideBlogForm = () => {
+    blogFormRef.current.toggleVisibility();
+  };
+
+  return (
+    <div>
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <BlogForm hideBlogForm={hideBlogForm} />
+      </Togglable>
+
+      <br />
+
+      <div className="blog-list">
+        <BlogList user={user} />
+      </div>
+    </div>
+  );
+};
+
 const App = () => {
   const user = useSelector((state) => state.user);
 
@@ -22,9 +44,6 @@ const App = () => {
 
   useEffect(() => {
     dispatch(initializeBlogs());
-  }, [dispatch]);
-
-  useEffect(() => {
     dispatch(initializeMembers());
   }, [dispatch]);
 
@@ -36,11 +55,6 @@ const App = () => {
       blogService.setToken(user.token);
     }
   }, []);
-
-  const blogFormRef = useRef();
-  const hideBlogForm = () => {
-    blogFormRef.current.toggleVisibility();
-  };
 
   const login = async (userObject) => {
     try {
@@ -71,48 +85,8 @@ const App = () => {
     );
   }
 
-  const Home = () => (
-    <div>
-      <h2>Blogs</h2>
-      <Notification />
-
-      <div>
-        <div>{user.name} logged in</div>
-        <br />
-        <button onClick={removeStorage}>logout</button>
-      </div>
-
-      <br />
-
-      <Togglable buttonLabel="new blog" ref={blogFormRef}>
-        <BlogForm hideBlogForm={hideBlogForm} />
-      </Togglable>
-
-      <br />
-
-      <div className="blog-list">
-        <BlogList user={user} />
-      </div>
-    </div>
-  );
-
-  const Users = () => (
-    <div>
-      <h2>Blogs</h2>
-      <Notification />
-
-      <div>
-        <div>{user.name} logged in</div>
-        <br />
-        <button onClick={removeStorage}>logout</button>
-      </div>
-
-      <MemberList />
-    </div>
-  );
-
   return (
-    <Router>
+    <>
       {/* <div>
         <Link style={padding} to="/">
           home
@@ -122,15 +96,25 @@ const App = () => {
         </Link>
       </div> */}
 
+      <h2>Blogs</h2>
+      <Notification />
+
+      <div>
+        <div>{user.name} logged in</div>
+        <br />
+        <button onClick={removeStorage}>logout</button>
+      </div>
+
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/users" element={<Users />} />
+        <Route path="/" element={<Home user={user} />} />
+        <Route path="/users" element={<MemberList />} />
+        <Route path="/users/:id" element={<Member />} />
       </Routes>
 
       {/* <div>
         <i>Note app, Department of Computer Science 2022</i>
       </div> */}
-    </Router>
+    </>
   );
 };
 

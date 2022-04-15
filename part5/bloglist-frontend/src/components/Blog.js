@@ -1,14 +1,24 @@
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { deleteBlog, updateBlog } from '../reducers/blogReducer';
+import blogService from '../services/blogs';
 
 const Blog = () => {
+  const [commentInput, setCommentInput] = useState('');
+  const [comments, setComments] = useState([]);
   const user = useSelector((state) => state.user);
 
   const { id } = useParams();
   const blog = useSelector((state) =>
     state.blogs.find((blog) => blog.id === id),
   );
+
+  useEffect(() => {
+    if (blog) {
+      setComments(blog.comments);
+    }
+  }, [blog]);
 
   const dispatch = useDispatch();
 
@@ -27,6 +37,13 @@ const Blog = () => {
       dispatch(deleteBlog(blog));
       navigate('/');
     }
+  };
+
+  const handleCommentSubmit = (event) => {
+    event.preventDefault();
+    blogService.createComment(blog.id, { content: commentInput });
+    setComments(comments.concat({ content: commentInput, id: 'uniqueId' }));
+    setCommentInput('');
   };
 
   if (!blog) {
@@ -50,8 +67,17 @@ const Blog = () => {
       ) : null}
       <br />
       <h3>Comments</h3>
+      <form onSubmit={handleCommentSubmit}>
+        <input
+          id="comment-input"
+          name="comment"
+          value={commentInput}
+          onChange={(e) => setCommentInput(e.target.value)}
+        />
+        <button type="submit">create</button>
+      </form>
       <ul>
-        {blog.comments.map((c) => (
+        {comments.map((c) => (
           <li key={c.id}>{c.content}</li>
         ))}
       </ul>

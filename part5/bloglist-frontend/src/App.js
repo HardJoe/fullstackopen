@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import BlogList from './components/BlogList';
@@ -25,7 +25,7 @@ const Home = () => {
 
   return (
     <div>
-      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+      <Togglable buttonLabel="create new" ref={blogFormRef}>
         <BlogForm hideBlogForm={hideBlogForm} />
       </Togglable>
 
@@ -76,6 +76,14 @@ const App = () => {
     window.location.reload(false);
   };
 
+  const navbar = {
+    backgroundColor: '#bfbfbf',
+  };
+
+  const padding = {
+    paddingRight: 5,
+  };
+
   if (!user) {
     return (
       <div>
@@ -88,23 +96,21 @@ const App = () => {
 
   return (
     <>
-      {/* <div>
+      <div style={navbar}>
         <Link style={padding} to="/">
-          home
+          blogs
         </Link>
         <Link style={padding} to="/users">
           users
         </Link>
-      </div> */}
-
-      <h2>Blogs</h2>
-      <Notification />
-
-      <div>
-        <div>{user.name} logged in</div>
-        <br />
+        <span style={padding}>
+          <b>{user.name} logged in</b>
+        </span>
         <button onClick={removeStorage}>logout</button>
       </div>
+
+      <h2>Blog App</h2>
+      <Notification />
 
       <Routes>
         <Route path="/" element={<Home user={user} />} />

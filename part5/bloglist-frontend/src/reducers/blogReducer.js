@@ -47,8 +47,9 @@ export const createBlog = (blog) => {
 export const updateBlog = (blog) => {
   return async (dispatch) => {
     try {
-      const updatedBlog = await blogService.update(blog.id, blog);
-      dispatch(modifyBlog(updatedBlog));
+      const blogToSend = { ...blog, user: blog.user.id };
+      await blogService.update(blog.id, blogToSend);
+      dispatch(modifyBlog(blog));
       dispatch(setNotification(`You liked "${blog.title}".`, 3, true));
     } catch (err) {
       dispatch(setNotification(err.response.data.error, 3, false));

@@ -39,6 +39,7 @@ const LoginForm = ({ login }) => {
           value={password}
           name="password"
           onChange={handlePasswordChange}
+          autoComplete="on"
         />
       </div>
       <button type="submit">login</button>

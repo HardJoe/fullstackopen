@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Route, Routes } from 'react-router-dom';
+import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import BlogList from './components/BlogList';
 import LoginForm from './components/LoginForm';
@@ -16,7 +17,7 @@ import { setUser } from './reducers/userReducer';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
-const Home = ({ user }) => {
+const Home = () => {
   const blogFormRef = useRef();
   const hideBlogForm = () => {
     blogFormRef.current.toggleVisibility();
@@ -31,7 +32,7 @@ const Home = ({ user }) => {
       <br />
 
       <div className="blog-list">
-        <BlogList user={user} />
+        <BlogList />
       </div>
     </div>
   );
@@ -109,6 +110,7 @@ const App = () => {
         <Route path="/" element={<Home user={user} />} />
         <Route path="/users" element={<MemberList />} />
         <Route path="/users/:id" element={<Member />} />
+        <Route path="/blogs/:id" element={<Blog />} />
       </Routes>
 
       {/* <div>

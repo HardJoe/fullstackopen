@@ -1,15 +1,19 @@
-import { Container } from '@material-ui/core';
-import { useEffect, useRef } from 'react';
+import {
+  AppBar,
+  Button,
+  Container,
+  Toolbar,
+  Typography,
+} from '@material-ui/core';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, Route, Routes } from 'react-router-dom';
 import Blog from './components/Blog';
-import BlogForm from './components/BlogForm';
-import BlogList from './components/BlogList';
+import Home from './components/Home';
 import LoginForm from './components/LoginForm';
 import Member from './components/Member';
 import MemberList from './components/MemberList';
 import Notification from './components/Notification';
-import Togglable from './components/Togglable';
 import './index.css';
 import { initializeBlogs } from './reducers/blogReducer';
 import { initializeMembers } from './reducers/memberReducer';
@@ -17,27 +21,6 @@ import { setNotification } from './reducers/notificationReducer';
 import { setUser } from './reducers/userReducer';
 import blogService from './services/blogs';
 import loginService from './services/login';
-
-const Home = () => {
-  const blogFormRef = useRef();
-  const hideBlogForm = () => {
-    blogFormRef.current.toggleVisibility();
-  };
-
-  return (
-    <div>
-      <Togglable buttonLabel="create new" ref={blogFormRef}>
-        <BlogForm hideBlogForm={hideBlogForm} />
-      </Togglable>
-
-      <br />
-
-      <div className="blog-list">
-        <BlogList />
-      </div>
-    </div>
-  );
-};
 
 const App = () => {
   const user = useSelector((state) => state.user);
@@ -77,12 +60,8 @@ const App = () => {
     window.location.reload(false);
   };
 
-  const navbar = {
-    backgroundColor: '#bfbfbf',
-  };
-
-  const padding = {
-    paddingRight: 5,
+  const margin = {
+    margin: 5,
   };
 
   if (!user) {
@@ -96,32 +75,49 @@ const App = () => {
 
   return (
     <Container>
-      <div style={navbar}>
-        <Link style={padding} to="/">
-          blogs
-        </Link>
-        <Link style={padding} to="/users">
-          users
-        </Link>
-        <span style={padding}>
-          <b>{user.name} logged in</b>
-        </span>
-        <button onClick={removeStorage}>logout</button>
-      </div>
+      <Container>
+        <AppBar position="static" style={margin}>
+          <Toolbar>
+            <Button color="inherit" component={Link} to="/">
+              Home
+            </Button>
+            <Button color="inherit" component={Link} to="/users">
+              Users
+            </Button>
+            <Typography variant="body1" style={margin}>
+              <b>{user.name} logged in</b>
+            </Typography>
+            <Button
+              variant="contained"
+              color="error"
+              style={margin}
+              onClick={removeStorage}
+            >
+              logout
+            </Button>
+          </Toolbar>
+        </AppBar>
+      </Container>
 
-      <h2>Blog App</h2>
-      <Notification />
+      <Container>
+        <Notification />
+        <Typography variant="h3" style={margin}>
+          BLOG APP
+        </Typography>
+      </Container>
 
-      <Routes>
-        <Route path="/" element={<Home user={user} />} />
-        <Route path="/users" element={<MemberList />} />
-        <Route path="/users/:id" element={<Member />} />
-        <Route path="/blogs/:id" element={<Blog />} />
-      </Routes>
+      <Container>
+        <Routes style={margin}>
+          <Route path="/" element={<Home />} />
+          <Route path="/users" element={<MemberList />} />
+          <Route path="/users/:id" element={<Member />} />
+          <Route path="/blogs/:id" element={<Blog />} />
+        </Routes>
+      </Container>
 
-      <div>
-        <i>Blog app, © 2022 Joe Hartman </i>
-      </div>
+      <Container style={margin}>
+        <Typography variant="caption">© 2022 Joe Hartman</Typography>
+      </Container>
     </Container>
   );
 };

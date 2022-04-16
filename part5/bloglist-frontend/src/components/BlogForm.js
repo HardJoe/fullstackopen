@@ -1,3 +1,4 @@
+import { Box, Button, TextField, Typography } from '@material-ui/core';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { createBlog } from '../reducers/blogReducer';
@@ -33,11 +34,11 @@ const BlogForm = ({ hideBlogForm }) => {
 
   return (
     <div>
-      <h2>Create New Blog</h2>
+      <Typography variant="h5">Create New Blog</Typography>
       <form onSubmit={handleSubmit}>
         <div>
-          title:
-          <input
+          <Typography variant="body2">title:</Typography>
+          <TextField
             id="title-input"
             name="title"
             placeholder="My Title"
@@ -46,8 +47,8 @@ const BlogForm = ({ hideBlogForm }) => {
           />
         </div>
         <div>
-          author:
-          <input
+          <Typography variant="body2">author:</Typography>
+          <TextField
             id="author-input"
             name="author"
             placeholder="Author Aurora"
@@ -56,8 +57,8 @@ const BlogForm = ({ hideBlogForm }) => {
           />
         </div>
         <div>
-          url:
-          <input
+          <Typography variant="body2">url:</Typography>
+          <TextField
             id="url-input"
             name="url"
             placeholder="url.com"
@@ -65,7 +66,11 @@ const BlogForm = ({ hideBlogForm }) => {
             onChange={handleUrlChange}
           />
         </div>
-        <button type="submit">create</button>
+        <Box mt={1} pt={1}>
+          <Button variant="contained" color="primary" type="submit">
+            create
+          </Button>
+        </Box>
       </form>
     </div>
   );

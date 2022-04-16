@@ -1,3 +1,4 @@
+import { Alert } from '@material-ui/lab';
 import { useSelector } from 'react-redux';
 
 const Notification = () => {
@@ -5,7 +6,7 @@ const Notification = () => {
   const last = notif[notif.length - 1];
 
   return notif.length > 0 ? (
-    <div className={last.success ? 'success' : 'error'}>{last.content}</div>
+    <Alert severity={last.success ? 'success' : 'error'}>{last.content}</Alert>
   ) : null;
 };
 

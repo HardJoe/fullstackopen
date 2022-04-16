@@ -1,3 +1,4 @@
+import { Typography } from '@material-ui/core';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -18,7 +19,9 @@ const BlogList = () => {
       {sortedBlogs.map((blog) => (
         <div key={blog.id} style={blogStyle}>
           <Link to={`/blogs/${blog.id}`}>
-            {blog.title} by {blog.author}
+            <Typography variant="body1">
+              {blog.title} by {blog.author}
+            </Typography>
           </Link>
         </div>
       ))}

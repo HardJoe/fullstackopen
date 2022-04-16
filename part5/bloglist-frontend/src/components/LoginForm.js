@@ -22,7 +22,7 @@ const LoginForm = ({ login }) => {
 
   return (
     <div>
-      <Typography variant="h2">Log in to application</Typography>
+      <Typography variant="h3">Log in to application</Typography>
       <form onSubmit={handleSubmit}>
         <div id="login-form">
           <Typography variant="body2">username</Typography>

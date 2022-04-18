@@ -10,9 +10,7 @@ const SetBirthYear = (props) => {
     refetchQueries: [{ query: ALL_AUTHORS }],
   });
 
-  if (!props.show) {
-    return null;
-  }
+  const authors = props.authors;
 
   const submit = async (event) => {
     event.preventDefault();
@@ -29,10 +27,13 @@ const SetBirthYear = (props) => {
       <form onSubmit={submit}>
         <div>
           name
-          <input
-            value={name}
-            onChange={({ target }) => setName(target.value)}
-          />
+          <select value={name} onChange={({ target }) => setName(target.value)}>
+            {authors.map((a) => (
+              <option key={a.name} value={a.name}>
+                {a.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           born

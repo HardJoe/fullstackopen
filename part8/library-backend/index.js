@@ -136,13 +136,18 @@ const resolvers = {
     addBook: async (root, args) => {
       const { author, ...bookArgs } = args;
       const book = new Book(bookArgs);
-
       const foundAuthor = await Author.find({ name: author });
-      if (foundAuthor.length < 1) {
-        const newAuthor = new Author({ name: author });
-        await newAuthor.save();
+      try {
+        if (foundAuthor.length < 1) {
+          const newAuthor = new Author({ name: author });
+          await newAuthor.save();
+        }
+        return book.save();
+      } catch (err) {
+        throw new UserInputError(err.message, {
+          invalidArgs: args,
+        });
       }
-      return book.save();
     },
     editAuthor: async (root, { name, setBornTo }) => {
       const filter = { name };

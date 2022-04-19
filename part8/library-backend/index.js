@@ -1,30 +1,29 @@
-const { ApolloServer, gql } = require('apollo-server');
+require('dotenv').config();
+const { ApolloServer, UserInputError, gql } = require('apollo-server');
 const { argsToArgsConfig } = require('graphql/type/definition');
 const { v1: uuid } = require('uuid');
+const mongoose = require('mongoose');
+const Author = require('./src/models/author');
+const Book = require('./src/models/book');
 
 let authors = [
   {
     name: 'Robert Martin',
-    id: 'afa51ab0-344d-11e9-a414-719c6709cf3e',
     born: 1952,
   },
   {
     name: 'Martin Fowler',
-    id: 'afa5b6f0-344d-11e9-a414-719c6709cf3e',
     born: 1963,
   },
   {
     name: 'Fyodor Dostoevsky',
-    id: 'afa5b6f1-344d-11e9-a414-719c6709cf3e',
     born: 1821,
   },
   {
     name: 'Joshua Kerievsky', // birthyear not known
-    id: 'afa5b6f2-344d-11e9-a414-719c6709cf3e',
   },
   {
     name: 'Sandi Metz', // birthyear not known
-    id: 'afa5b6f3-344d-11e9-a414-719c6709cf3e',
   },
 ];
 
@@ -42,50 +41,43 @@ let books = [
   {
     title: 'Clean Code',
     published: 2008,
-    author: 'Robert Martin',
-    id: 'afa5b6f4-344d-11e9-a414-719c6709cf3e',
+    // author: 'Robert Martin',
     genres: ['refactoring'],
   },
   {
     title: 'Agile software development',
     published: 2002,
-    author: 'Robert Martin',
-    id: 'afa5b6f5-344d-11e9-a414-719c6709cf3e',
+    // author: 'Robert Martin',
     genres: ['agile', 'patterns', 'design'],
   },
   {
     title: 'Refactoring, edition 2',
     published: 2018,
-    author: 'Martin Fowler',
-    id: 'afa5de00-344d-11e9-a414-719c6709cf3e',
+    // author: 'Martin Fowler',
     genres: ['refactoring'],
   },
   {
     title: 'Refactoring to patterns',
     published: 2008,
-    author: 'Joshua Kerievsky',
-    id: 'afa5de01-344d-11e9-a414-719c6709cf3e',
+    // author: 'Joshua Kerievsky',
     genres: ['refactoring', 'patterns'],
   },
   {
     title: 'Practical Object-Oriented Design, An Agile Primer Using Ruby',
     published: 2012,
-    author: 'Sandi Metz',
-    id: 'afa5de02-344d-11e9-a414-719c6709cf3e',
+    // author: 'Sandi Metz',
     genres: ['refactoring', 'design'],
   },
   {
     title: 'Crime and punishment',
     published: 1866,
-    author: 'Fyodor Dostoevsky',
-    id: 'afa5de03-344d-11e9-a414-719c6709cf3e',
+    // author: 'Fyodor Dostoevsky',
     genres: ['classic', 'crime'],
   },
   {
-    title: 'The Demon ',
+    title: 'The Demon',
     published: 1872,
-    author: 'Fyodor Dostoevsky',
-    id: 'afa5de04-344d-11e9-a414-719c6709cf3e',
+    // author: 'Fyodor Dostoevsky',
     genres: ['classic', 'revolution'],
   },
 ];
@@ -101,7 +93,7 @@ const typeDefs = gql`
   type Book {
     title: String!
     published: Int!
-    author: String!
+    author: Author!
     id: ID!
     genres: [String!]!
   }
@@ -119,7 +111,7 @@ const typeDefs = gql`
       published: Int!
       author: String!
       genres: [String!]!
-    ): Book
+    ): Book!
 
     editAuthor(name: String!, setBornTo: Int!): Author
   }
@@ -127,54 +119,88 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    authorCount: () => authors.length,
-    bookCount: () => books.length,
-    allBooks: (root, { author, genre }) => {
-      if (!(author || genre)) {
-        return books;
-      }
+    authorCount: async () => Author.countDocuments(),
+    bookCount: async () => Book.countDocuments(),
+    allBooks: async (root, args) => {
+      // if (!(author || genre)) {
+      //   return books;
+      // }
 
-      let res = books;
+      // let res = books;
 
-      if (author) {
-        res = res.filter((b) => b.author === author);
-      }
+      // if (author) {
+      //   res = res.filter((b) => b.author === author);
+      // }
 
-      if (genre) {
-        res = res.filter((b) => b.genres.includes(genre));
-      }
+      // if (genre) {
+      //   res = res.filter((b) => b.genres.includes(genre));
+      // }
 
-      return res;
+      // return res;
+
+      return Book.find({});
     },
-    allAuthors: () => authors,
+    allAuthors: async () => {
+      return Author.find({});
+    },
   },
-  Author: {
-    bookCount: (root) => books.filter((b) => b.author === root.name).length,
-  },
+  // Author: {
+  //   bookCount: (root) => books.filter((b) => b.author === root.name).length,
+  // },
   Mutation: {
-    addBook: (root, args) => {
-      if (authors.filter((a) => a.name === args.author).length === 0) {
-        authors = authors.concat({
-          name: args.author,
-          born: null,
-          bookCount: 1,
-        });
+    addBook: async (root, args) => {
+      // if (authors.filter((a) => a.name === args.author).length === 0) {
+      //   authors = authors.concat({
+      //     name: args.author,
+      //     born: null,
+      //     bookCount: 1,
+      //   });
+      // }
+      // const book = { ...args, id: uuid() };
+      // books = books.concat(book);
+      // return book;
+
+      const { author, ...bookArgs } = args;
+      const book = new Book(bookArgs);
+
+      const foundAuthor = await Author.find({ name: author });
+      if (foundAuthor.length < 1) {
+        const newAuthor = new Author({ name: author });
+        await newAuthor.save();
       }
-      const book = { ...args, id: uuid() };
-      books = books.concat(book);
-      return book;
+
+      return book.save();
     },
-    editAuthor: (root, args) => {
-      let authorToUpdate = authors.find((a) => a.name === args.name);
-      if (!authorToUpdate) {
-        return null;
-      }
-      authorToUpdate = { ...authorToUpdate, born: args.setBornTo };
-      authors = authors.map((a) => (a.name === args.name ? authorToUpdate : a));
-      return authorToUpdate;
-    },
+    // editAuthor: (root, args) => {
+    //   let authorToUpdate = authors.find((a) => a.name === args.name);
+    //   if (!authorToUpdate) {
+    //     return null;
+    //   }
+    //   authorToUpdate = { ...authorToUpdate, born: args.setBornTo };
+    //   authors = authors.map((a) => (a.name === args.name ? authorToUpdate : a));
+    //   return authorToUpdate;
+    // },
   },
 };
+
+const MONGODB_URI = process.env.DEV_MONGODB_URI;
+
+console.log('connecting to', MONGODB_URI);
+
+mongoose
+  .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(async () => {
+    await Author.deleteMany({});
+    await Book.deleteMany({});
+    console.log('connected to MongoDB');
+    await Author.insertMany(authors);
+    console.log('authors inserted');
+    await Book.insertMany(books);
+    console.log('books inserted');
+  })
+  .catch((error) => {
+    console.log('error connection to MongoDB:', error.message);
+  });
 
 const server = new ApolloServer({
   typeDefs,

@@ -16,20 +16,25 @@ let authors = [
   {
     name: 'Robert Martin',
     born: 1952,
+    _id: '625f660c06ad37b4fb86a8a4',
   },
   {
     name: 'Martin Fowler',
     born: 1963,
+    _id: '625f6639ebd8a63f3933a3cd',
   },
   {
     name: 'Fyodor Dostoevsky',
     born: 1821,
+    _id: '625f66413aa9eee88492b699',
   },
   {
     name: 'Joshua Kerievsky', // birthyear not known
+    _id: '625f6650adb4e0a774f73e12',
   },
   {
     name: 'Sandi Metz', // birthyear not known
+    _id: '625f665986a4eda5e0cbb37b',
   },
 ];
 
@@ -47,43 +52,43 @@ let books = [
   {
     title: 'Clean Code',
     published: 2008,
-    // author: 'Robert Martin',
+    author: '625f660c06ad37b4fb86a8a4',
     genres: ['refactoring'],
   },
   {
     title: 'Agile software development',
     published: 2002,
-    // author: 'Robert Martin',
+    author: '625f660c06ad37b4fb86a8a4',
     genres: ['agile', 'patterns', 'design'],
   },
   {
     title: 'Refactoring, edition 2',
     published: 2018,
-    // author: 'Martin Fowler',
+    author: '625f6639ebd8a63f3933a3cd',
     genres: ['refactoring'],
   },
   {
     title: 'Refactoring to patterns',
     published: 2008,
-    // author: 'Joshua Kerievsky',
+    author: '625f6650adb4e0a774f73e12',
     genres: ['refactoring', 'patterns'],
   },
   {
     title: 'Practical Object-Oriented Design, An Agile Primer Using Ruby',
     published: 2012,
-    // author: 'Sandi Metz',
+    author: '625f665986a4eda5e0cbb37b',
     genres: ['refactoring', 'design'],
   },
   {
     title: 'Crime and punishment',
     published: 1866,
-    // author: 'Fyodor Dostoevsky',
+    author: '625f66413aa9eee88492b699',
     genres: ['classic', 'crime'],
   },
   {
     title: 'The Demon',
     published: 1872,
-    // author: 'Fyodor Dostoevsky',
+    author: '625f66413aa9eee88492b699',
     genres: ['classic', 'revolution'],
   },
 ];
@@ -143,18 +148,21 @@ const resolvers = {
     bookCount: async () => Book.countDocuments(),
     allBooks: async (root, { author, genre }) => {
       if (!(author || genre)) {
-        return Book.find({});
+        return Book.find({}).populate('author');
       }
-      return Book.find({ genres: { $in: [genre] } });
+      return Book.find({ genres: { $in: [genre] } }).populate('author');
     },
     allAuthors: async () => Author.find({}),
     me: (root, args, context) => {
       return context.currentUser;
     },
   },
-  // Author: {
-  //   bookCount: (root) => books.filter((b) => b.author === root.name).length,
-  // },
+  Author: {
+    bookCount: async (root) => {
+      const books = await Book.find({ author: root._id });
+      return books.length;
+    },
+  },
   Mutation: {
     addBook: async (root, args, context) => {
       const { author, ...bookArgs } = args;
@@ -170,6 +178,9 @@ const resolvers = {
         if (foundAuthor.length < 1) {
           const newAuthor = new Author({ name: author });
           await newAuthor.save();
+          book.author = newAuthor._id;
+        } else {
+          book.author = foundAuthor._id;
         }
         return book.save();
       } catch (err) {

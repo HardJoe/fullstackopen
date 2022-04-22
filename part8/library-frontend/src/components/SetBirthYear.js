@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../queries';
 
 const SetBirthYear = (props) => {
-  const [name, setName] = useState('');
+  const [name, setName] = useState('Robert Martin');
   const [born, setBorn] = useState('');
 
   const [setBirthYear] = useMutation(EDIT_AUTHOR, {
@@ -18,7 +18,7 @@ const SetBirthYear = (props) => {
     const setBornTo = born;
     setBirthYear({ variables: { name, setBornTo } });
 
-    setName('');
+    setName('Robert Martin');
     setBorn('');
   };
 

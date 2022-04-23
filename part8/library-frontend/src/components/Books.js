@@ -1,8 +1,13 @@
-import { useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
+import { useEffect } from 'react';
 import { ALL_BOOKS } from '../queries';
 
 const Books = (props) => {
-  const result = useQuery(ALL_BOOKS);
+  const [getBooks, result] = useLazyQuery(ALL_BOOKS);
+
+  useEffect(() => {
+    getBooks();
+  }, [getBooks]);
 
   if (!props.show) {
     return null;
@@ -13,6 +18,7 @@ const Books = (props) => {
   }
 
   const books = result.data.allBooks;
+  const genres = result.data.allGenres;
 
   return (
     <div>
@@ -34,6 +40,21 @@ const Books = (props) => {
           ))}
         </tbody>
       </table>
+
+      <div>
+        {genres.map((a) => (
+          <button
+            key={a}
+            value={a}
+            onClick={(e) => getBooks({ variables: { genre: e.target.value } })}
+          >
+            {a}
+          </button>
+        ))}
+        <button onClick={() => getBooks({ variables: { genre: null } })}>
+          all genres
+        </button>
+      </div>
     </div>
   );
 };

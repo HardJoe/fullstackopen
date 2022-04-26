@@ -1,4 +1,4 @@
-import { useApolloClient } from '@apollo/client';
+import { gql, useApolloClient, useSubscription } from '@apollo/client';
 import { useEffect, useState } from 'react';
 import Authors from './components/Authors';
 import Books from './components/Books';
@@ -6,6 +6,45 @@ import LoginForm from './components/LoginForm';
 import NewBook from './components/NewBook';
 import Notify from './components/Notify';
 import Recommend from './components/Recommend';
+import { ALL_BOOKS } from './queries';
+
+const BOOK_DETAILS = gql`
+  fragment BookDetails on Book {
+    title
+    author {
+      name
+    }
+    published
+    genres
+  }
+`;
+
+export const BOOK_ADDED = gql`
+  subscription {
+    bookAdded {
+      ...BookDetails
+    }
+  }
+  
+${BOOK_DETAILS}
+`;
+
+// function that takes care of manipulating cache
+export const updateCache = (cache, query, addedBook) => {
+  const uniqByTitle = (a) => {
+    let seen = new Set();
+    return a.filter((item) => {
+      let k = item.title;
+      return seen.has(k) ? false : seen.add(k);
+    });
+  };
+  cache.updateQuery(query, ({ allBooks }) => {
+    return {
+      allBooks: uniqByTitle(allBooks.concat(addedBook)),
+    };
+  });
+};
+
 
 const App = () => {
   const [page, setPage] = useState('authors');
@@ -19,6 +58,15 @@ const App = () => {
       setToken(localToken);
     }
   }, []);
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      console.log(subscriptionData);
+      const addedBook = subscriptionData.data.bookAdded;
+      notify(`${addedBook.name} added`);
+      updateCache(client.cache, { query: ALL_BOOKS }, addedBook);
+    }
+  });
 
   const notify = (message) => {
     setErrorMessage(message);

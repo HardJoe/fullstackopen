@@ -6,24 +6,29 @@ let authors = [
     name: 'Robert Martin',
     born: 1952,
     _id: '625f660c06ad37b4fb86a8a4',
+    bookCount: 2,
   },
   {
     name: 'Martin Fowler',
     born: 1963,
     _id: '625f6639ebd8a63f3933a3cd',
+    bookCount: 1,
   },
   {
     name: 'Fyodor Dostoevsky',
     born: 1821,
     _id: '625f66413aa9eee88492b699',
+    bookCount: 2,
   },
   {
     name: 'Joshua Kerievsky', // birthyear not known
     _id: '625f6650adb4e0a774f73e12',
+    bookCount: 1,
   },
   {
     name: 'Sandi Metz', // birthyear not known
     _id: '625f665986a4eda5e0cbb37b',
+    bookCount: 1,
   },
 ];
 

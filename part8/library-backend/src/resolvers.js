@@ -31,29 +31,24 @@ const resolvers = {
       return Array.from(genreSet);
     },
   },
-  Author: {
-    bookCount: async (root) => {
-      const books = await Book.find({ author: root._id });
-      return books.length;
-    },
-  },
   Mutation: {
     addBook: async (root, args, context) => {
-      const { author, ...bookArgs } = args;
-
       const currentUser = context.currentUser;
       if (!currentUser) {
         throw new AuthenticationError('not authenticated');
       }
 
-      const book = new Book(bookArgs);
-      const foundAuthor = await Author.find({ name: author });
+      const book = new Book(args);
+      const author = args.author;
+      const foundAuthor = await Author.findOne({ name: author });
       try {
-        if (foundAuthor.length < 1) {
-          const newAuthor = new Author({ name: author });
+        if (!foundAuthor) {
+          const newAuthor = new Author({ name: author, bookCount: 1 });
           await newAuthor.save();
           book.author = newAuthor._id;
         } else {
+          foundAuthor.bookCount += 1;
+          await foundAuthor.save();
           book.author = foundAuthor._id;
         }
         await book.save();

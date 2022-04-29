@@ -10,5 +10,8 @@
     "calculateExercises": "ts-node exerciseCalculator.ts"
   },
   "author": "HardJoe",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^17.0.30"
+  }
 }

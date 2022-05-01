@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/', (_req, res) => {
   const diagnoses = diagnosisService.getEntries();
-  res.json({ diagnoses });
+  res.json(diagnoses);
 });
 
 router.post('/', (_req, res) => {

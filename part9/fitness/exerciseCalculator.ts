@@ -13,7 +13,7 @@ const parseArguments = (args: Array<string>): Data => {
   const target = Number(args[2]);
   const hours = [];
 
-  for (let i: number = 3; i < args.length; i++) {
+  for (let i = 3; i < args.length; i++) {
     if (isNaN(Number(args[i]))) {
       throw new Error('Provided hours were not numbers!');
     }
@@ -76,4 +76,4 @@ try {
   console.log(errorMessage);
 }
 
-export {};
+export { calculateExercises };

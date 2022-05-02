@@ -1,6 +1,6 @@
 import express from 'express';
 import patientService from '../services/patientService';
-import { NewPatient } from '../types';
+import toNewPatientEntry from '../utils/patientUtil';
 
 const router = express.Router();
 
@@ -14,20 +14,23 @@ router.get('/:id', (req, res) => {
   if (patient) {
     res.json(patient);
   } else {
-    res.status(404).json('Patient not found');
+    res.status(404).json('Something went wrong. Error: Patient not found');
   }
 });
 
 router.post('/', (req, res) => {
-  const { name, dateOfBirth, ssn, gender, occupation } = req.body as NewPatient;
-  const newPatient = patientService.addPatient({
-    name,
-    dateOfBirth,
-    ssn,
-    gender,
-    occupation,
-  });
-  res.json(newPatient);
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const newPatientEntry = toNewPatientEntry(req.body);
+    const newPatient = patientService.addPatient(newPatientEntry);
+    res.json(newPatient);
+  } catch (error: unknown) {
+    let errorMessage = 'Something went wrong.';
+    if (error instanceof Error) {
+      errorMessage += ' Error: ' + error.message;
+    }
+    res.status(400).json(errorMessage);
+  }
 });
 
 export default router;
